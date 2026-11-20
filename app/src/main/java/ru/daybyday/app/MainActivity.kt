@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
                 onThemeChange = model::setTheme,
                 onClearAll = model::clearAll,
                 onDismissError = model::dismissError,
+                onDismissJourneyStartMeme = model::dismissJourneyStartMeme,
                 onDismissCelebration = model::dismissCelebration,
                 onOpenNotificationSettings = {
                     startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, packageName))

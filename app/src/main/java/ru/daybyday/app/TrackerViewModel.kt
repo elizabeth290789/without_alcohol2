@@ -40,6 +40,7 @@ class TrackerViewModel(application: Application) : AndroidViewModel(application)
     private val repository = (application as DayByDayApplication).repository
     private val today = MutableStateFlow(LocalDate.now())
     private val error = MutableStateFlow<String?>(null)
+    private val showJourneyStartMeme = MutableStateFlow(false)
     private val celebration = MutableStateFlow<UiCelebration?>(null)
     private val permission = MutableStateFlow(true)
     private val loaded = MutableStateFlow(false)
@@ -77,6 +78,8 @@ class TrackerViewModel(application: Application) : AndroidViewModel(application)
             notificationsAllowed = event.permission,
             isSaving = event.saving,
         )
+    }.combine(showJourneyStartMeme) { content, showMeme ->
+        content.copy(showJourneyStartMeme = showMeme)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, AppUiState(isLoading = true))
 
     init {
@@ -146,6 +149,7 @@ class TrackerViewModel(application: Application) : AndroidViewModel(application)
 
     fun start(date: LocalDate) = perform {
         repository.initialize(date, LocalDate.now())
+        showJourneyStartMeme.value = true
     }
 
     // This legacy entry remains for an unlinked initial period only. The
@@ -272,6 +276,7 @@ class TrackerViewModel(application: Application) : AndroidViewModel(application)
 
     fun clearAll() = perform {
         repository.clear()
+        dismissJourneyStartMeme()
         ru.daybyday.app.notifications.NotificationScheduler.cancel(getApplication())
         celebration.value = null
         previousAwardIds = emptySet()
@@ -280,6 +285,10 @@ class TrackerViewModel(application: Application) : AndroidViewModel(application)
 
     fun dismissError() {
         error.value = null
+    }
+
+    fun dismissJourneyStartMeme() {
+        showJourneyStartMeme.value = false
     }
 
     fun dismissCelebration() {

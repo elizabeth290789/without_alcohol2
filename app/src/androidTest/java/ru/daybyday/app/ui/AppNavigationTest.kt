@@ -45,12 +45,18 @@ class AppNavigationTest {
         scenario = ActivityScenario.launch(MainActivity::class.java)
         waitForText("Начать свой путь")
         compose.onNodeWithText("Начать свой путь").performScrollTo().performClick()
-        waitForText("Сейчас день 1")
-        compose.onNodeWithText("дней без алкоголя").assertExists()
+        waitForText("Продолжить")
         val saved = runBlocking { repository.readHistory() }
         assertEquals(LocalDate.now(), saved.periods.single().start)
         scenario.recreate()
+        waitForText("Продолжить")
+        compose.onNodeWithContentDescription("Не зовите меня бухать. Изменились приоритеты.").assertIsDisplayed()
+        compose.onNodeWithText("Продолжить").performClick()
         waitForText("Сейчас день 1")
+        compose.onNodeWithText("дней без алкоголя").assertExists()
+        scenario.recreate()
+        waitForText("Сейчас день 1")
+        compose.onNodeWithText("Продолжить").assertDoesNotExist()
         assertEquals(1, runBlocking { repository.readHistory() }.periods.size)
     }
 

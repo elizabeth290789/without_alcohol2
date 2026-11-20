@@ -27,6 +27,7 @@ data class AppUiState(
     val motivation: String = "Прогресс складывается из маленьких шагов",
     val error: String? = null,
     val celebration: UiCelebration? = null,
+    val showJourneyStartMeme: Boolean = false,
 )
 
 data class UiLevel(
@@ -93,6 +94,7 @@ data class AppActions(
     val onThemeChange: (Boolean) -> Unit = {},
     val onClearAll: () -> Unit = {},
     val onDismissError: () -> Unit = {},
+    val onDismissJourneyStartMeme: () -> Unit = {},
     val onDismissCelebration: () -> Unit = {},
     val onOpenNotificationSettings: () -> Unit = {},
     val onRecordConsumption: (LocalDate) -> Unit = {},

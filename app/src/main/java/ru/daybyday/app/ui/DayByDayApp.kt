@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -77,6 +78,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
@@ -117,7 +119,11 @@ fun DayByDayApp(state: AppUiState, actions: AppActions) {
                 }
             }
         }
-        state.celebration?.let { CelebrationDialog(it, actions.onDismissCelebration) }
+        if (state.showJourneyStartMeme && state.startDate != null) {
+            JourneyStartMemeDialog(actions.onDismissJourneyStartMeme)
+        } else {
+            state.celebration?.let { CelebrationDialog(it, actions.onDismissCelebration) }
+        }
     }
 }
 
@@ -441,6 +447,23 @@ private fun AwardDetailScreen(achievement: UiAchievement, bestDays: Long, onBack
         Text("Открытые награды остаются с тобой при начале нового периода.", style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(28.dp))
     }
+}
+
+@Composable
+private fun JourneyStartMemeDialog(onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        text = {
+            Image(
+                painter = painterResource(R.drawable.journey_start_meme),
+                contentDescription = stringResource(R.string.journey_start_meme_description),
+                modifier = Modifier.fillMaxWidth().heightIn(max = 440.dp),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.journey_continue)) }
+        },
+    )
 }
 
 @Composable

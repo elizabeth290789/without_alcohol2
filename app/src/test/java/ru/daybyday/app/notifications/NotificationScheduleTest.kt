@@ -4,10 +4,23 @@ import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import ru.daybyday.app.data.AppSettings
 
 class NotificationScheduleTest {
+    @Test fun dailyMessagesCoverEachDayFromOneToSixty() {
+        for (day in 1L..60L) {
+            val message = checkNotNull(dailyReminderMessage(day))
+            assertTrue(message.title.contains("День $day —"))
+            assertTrue(message.body.isNotBlank())
+        }
+        assertNull(dailyReminderMessage(0))
+        assertNull(dailyReminderMessage(61))
+        assertNull(dailyReminderMessage(Long.MAX_VALUE))
+    }
+
     @Test fun dailyReminderUsesChosenLocalTime() {
         val now = ZonedDateTime.of(2026, 10, 18, 19, 45, 0, 0, ZoneId.of("Europe/Moscow"))
         val settings = AppSettings(dailyEnabled = true, hour = 20, minute = 0)

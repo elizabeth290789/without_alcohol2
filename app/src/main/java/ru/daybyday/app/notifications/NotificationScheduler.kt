@@ -202,16 +202,25 @@ object NotificationCoordinator {
     internal suspend fun daily(context: Context) = withContext(Dispatchers.IO) {
         notificationMutex.withLock {
             val settings = SettingsRepository(context).settings.first()
-            if (!settings.dailyEnabled || TrackerRepository(context).readHistory().periods.isEmpty()) return@withLock
+            if (!settings.dailyEnabled) return@withLock
+            val history = TrackerRepository(context).readHistory()
+            if (history.periods.isEmpty()) return@withLock
             val now = ZonedDateTime.now()
             if (now.toLocalTime().isBefore(LocalTime.of(settings.hour, settings.minute))) return@withLock
-            val day = now.toLocalDate().toEpochDay()
+            val today = now.toLocalDate()
+            val day = today.toEpochDay()
             val alreadySent = context.notificationState.data.first()[Keys.dailyDate]
             // A clock rollback also cannot repeat an already announced calendar day.
             if (alreadySent != null && alreadySent >= day) return@withLock
+            val currentDay = TrackerDomain.snapshot(history.periods, history.awards, today).currentDay
+            val message = dailyReminderMessage(currentDay)
             context.notificationState.edit { it[Keys.dailyDate] = day }
-            val index = Math.floorMod(day, TrackerDomain.messages.size.toLong()).toInt()
-            post(context, DAILY_ID, context.getString(R.string.app_name), TrackerDomain.messages[index], settings)
+            if (message != null) {
+                post(context, DAILY_ID, message.title, message.body, settings)
+            } else {
+                val index = Math.floorMod(day, TrackerDomain.messages.size.toLong()).toInt()
+                post(context, DAILY_ID, context.getString(R.string.app_name), TrackerDomain.messages[index], settings)
+            }
         }
     }
 }

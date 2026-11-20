@@ -13,7 +13,7 @@ android {
         applicationId = "ru.daybyday.app2"
         minSdk = 28
         targetSdk = 35
-        versionCode = 4
+        versionCode = 5
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
